@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yourcaryourway.api.dto.ConversationDto;
 import com.yourcaryourway.api.service.ConversationService;
 
 @RestController
+@RequestMapping("/api/conversations")
 public class ConversationController {
     
     private final ConversationService conversationService;
@@ -31,7 +33,7 @@ public class ConversationController {
                 .toList();
     }
 
-    @PostMapping("/{id}/assign/{agentId}/")
+    @PostMapping("/{id}/assign/{agentId}")
     public ConversationDto assignAgent(@PathVariable Long id, @PathVariable Long agentId) {
         return ConversationDto.from(conversationService.assignAgentToConversation(id, agentId));
     }
