@@ -1,5 +1,7 @@
 @if (!sessionService.currentUser()) {
   <app-profile-selector />
+} @else if (sessionService.currentUser()!.role === 'CLIENT') {
+  <app-client-flow [currentUser]="sessionService.currentUser()!" />
 } @else {
   <div class="session-placeholder">
     <p>Connecté en tant que {{ sessionService.currentUser()?.firstName }} ({{ sessionService.currentUser()?.role }})</p>

@@ -1,0 +1,7 @@
+@if (conversation()?.agent) {
+  <app-chat-window [conversationId]="conversation()!.id" [currentUser]="currentUser()" />
+} @else {
+  <div class="waiting">
+    <p>En attente d'un conseiller disponible...</p>
+  </div>
+}
