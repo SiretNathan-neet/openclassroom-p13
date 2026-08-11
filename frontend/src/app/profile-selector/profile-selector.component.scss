@@ -1,0 +1,65 @@
+.profile-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 480px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-size: 1.6rem;
+  white-space: nowrap;
+  margin: 0;
+  color: #1e293b;
+}
+
+.role-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+
+  h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  button {
+    width: 300px;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+  }
+}
+
+.role-group.clients {
+  h2 { color: #1c4e9c; }
+  button {
+    background: #e8f0fc;
+    color: #1c4e9c;
+  }
+}
+
+.role-group.agent {
+  h2 { color: #c2410c; }
+  button {
+    background: #fdeee7;
+    color: #c2410c;
+  }
+}
