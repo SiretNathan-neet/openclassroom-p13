@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { User } from "../models/user.model";
 import { ConversationService } from "../services/conversation.service";
 import { Conversation } from "../models/conversation.model";
+import { SessionService } from "../services/session.service";
 
 @Component({
   selector: "app-agent-flow",
@@ -20,7 +21,7 @@ export class AgentFlowComponent implements OnInit {
     readonly activeConversation = signal<Conversation | null>(null);
     private pollHandle: ReturnType<typeof setInterval> | null = null;
 
-    constructor(private conversationService: ConversationService) {}
+    constructor(private conversationService: ConversationService, protected sessionService: SessionService) {}
 
     ngOnInit(): void {
         this.refreshPending();
