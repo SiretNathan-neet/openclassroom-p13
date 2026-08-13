@@ -4,6 +4,7 @@ import { Conversation } from '../models/conversation.model';
 import { User } from '../models/user.model';
 import { ConversationService } from '../services/conversation.service';
 import { ChatWindowComponent } from '../chat-window/chat-window.component';
+import { SessionService } from '../services/session.service';
 
 @Component({
   selector: 'app-client-flow',
@@ -18,7 +19,7 @@ export class ClientFlowComponent implements OnInit, OnDestroy {
   readonly conversation = signal<Conversation | null>(null);
   private pollHandle: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private conversationService: ConversationService) {}
+  constructor(private conversationService: ConversationService, protected sessionService: SessionService) {}
 
   ngOnInit(): void {
     this.openConversation();

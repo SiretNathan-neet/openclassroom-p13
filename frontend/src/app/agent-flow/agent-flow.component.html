@@ -1,3 +1,8 @@
+<div class="flow-header">
+    <span>{{ currentUser().firstName }} {{ currentUser().lastName }}</span>
+    <button (click)="sessionService.clear()">Changer de profil</button>
+</div>
+
 @if (activeConversation()) {
     <app-chat-window [conversationId]="activeConversation()!.id" [currentUser]="currentUser()" />
 } @else {
