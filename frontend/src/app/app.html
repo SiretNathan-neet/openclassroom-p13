@@ -2,9 +2,11 @@
   <app-profile-selector />
 } @else if (sessionService.currentUser()!.role === 'CLIENT') {
   <app-client-flow [currentUser]="sessionService.currentUser()!" />
+} @else if (sessionService.currentUser()!.role === 'AGENT') {
+  <app-agent-flow [currentUser]="sessionService.currentUser()!" />
 } @else {
   <div class="session-placeholder">
-    <p>Connecté en tant que {{ sessionService.currentUser()?.firstName }} ({{ sessionService.currentUser()?.role }})</p>
+    <p>Connecté en tant qu'administrateur</p>
     <button (click)="sessionService.clear()">Changer de profil</button>
   </div>
 }

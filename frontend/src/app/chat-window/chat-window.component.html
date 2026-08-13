@@ -10,6 +10,10 @@
     }
   </div>
 
+  @if (!chatService.connected()) {
+    <p class="connecting">Connexion au chat en cours...</p>
+  }
+
   <form class="composer" (ngSubmit)="send()">
     <input type="text" [(ngModel)]="draft" name="draft" placeholder="Écrire un message..." />
     <button type="submit">Envoyer</button>
