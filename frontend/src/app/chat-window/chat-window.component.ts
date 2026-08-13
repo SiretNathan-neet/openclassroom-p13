@@ -21,7 +21,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
   readonly messages = signal<Message[]>([]);
   draft = '';
 
-  constructor(private conversationService: ConversationService, private chatService: ChatService) {}
+  constructor(private conversationService: ConversationService, protected chatService: ChatService) {}
 
   ngOnInit(): void {
     this.conversationService.getMessages(this.conversationId()).subscribe(history => {
