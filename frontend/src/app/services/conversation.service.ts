@@ -26,4 +26,8 @@ export class ConversationService {
   getMessages(conversationId: number): Observable<Message[]> {
     return this.http.get<Message[]>(`${this.baseUrl}/${conversationId}/messages`);
   }
+
+  close(conversationId: number): Observable<Conversation> {
+    return this.http.post<Conversation>(`${this.baseUrl}/${conversationId}/close`, {});
+  }
 }

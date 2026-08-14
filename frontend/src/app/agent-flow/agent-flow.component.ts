@@ -45,4 +45,9 @@ export class AgentFlowComponent implements OnInit {
             this.activeConversation.set(conv);
         });
     }
+
+    onConversationClosed(): void {
+        this.activeConversation.set(null);
+        this.refreshPending();
+    }
 }

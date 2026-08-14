@@ -11,11 +11,11 @@
   </div>
 
   @if (!chatService.connected()) {
-    <p class="connecting">Connexion au chat en cours...</p>
+    <p class="connecting">Connexion en cours...</p>
   }
 
   <form class="composer" (ngSubmit)="send()">
-    <input type="text" [(ngModel)]="draft" name="draft" placeholder="Écrire un message..." />
-    <button type="submit">Envoyer</button>
+    <input type="text" [(ngModel)]="draft" name="draft" placeholder="Écrire un message..." [disabled]="!chatService.connected()" />
+    <button type="submit" [disabled]="!chatService.connected()">Envoyer</button>
   </form>
 </div>

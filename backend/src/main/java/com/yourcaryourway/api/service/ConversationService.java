@@ -1,9 +1,12 @@
 package com.yourcaryourway.api.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yourcaryourway.api.dto.ConversationDto;
 import com.yourcaryourway.api.model.Conversation;
 import com.yourcaryourway.api.model.ConversationStatus;
 import com.yourcaryourway.api.model.User;
@@ -15,33 +18,45 @@ public class ConversationService {
     
     private final UserRepository userRepository;
     private final ConversationRepository conversationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public ConversationService(UserRepository userRepository, ConversationRepository conversationRepository) {
+    public ConversationService(UserRepository userRepository, ConversationRepository conversationRepository, SimpMessagingTemplate messagingTemplate) {
         this.userRepository = userRepository;
         this.conversationRepository = conversationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
-    public Conversation findOrCreateConversation(Long userId) {
-        return conversationRepository.findFirstByUser_IdAndStatusNotOrderByStartedAtDesc(userId, ConversationStatus.CLOSED)
+    public Conversation findOrCreateConversation(Long clientId) {
+        return conversationRepository.findFirstByUser_IdAndStatusNotOrderByStartedAtDesc(clientId, ConversationStatus.CLOSED)
                 .orElseGet(() -> {
-                    User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
-                    Conversation newConversation = new Conversation(user);
-                    return conversationRepository.save(newConversation);
+                    User client = userRepository.findById(clientId).orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable : " + clientId));
+                    return conversationRepository.save(new Conversation(client));
                 });
     }
 
-    public List<Conversation> findOpenConversationsWithoutAgent() {
+    public List<Conversation> findPending() {
         return conversationRepository.findByAgentIsNullAndStatusNot(ConversationStatus.CLOSED);
     }
 
-    public Conversation assignAgentToConversation(Long conversationId, Long agentId) {
+    public Conversation assignAgent(Long conversationId, Long agentId) {
         Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new RuntimeException("Conversation introuvable"));
+                .orElseThrow(() -> new NoSuchElementException("Conversation introuvable : " + conversationId));
         User agent = userRepository.findById(agentId)
-                .orElseThrow(() -> new RuntimeException("Agent introuvable"));
+                .orElseThrow(() -> new NoSuchElementException("Agent introuvable : " + agentId));
 
         conversation.setAgent(agent);
         conversation.setStatus(ConversationStatus.HUMAN);
         return conversationRepository.save(conversation);
+    }
+
+    public Conversation closeConversation(Long conversationId) {
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new NoSuchElementException("Conversation introuvable : " + conversationId));
+
+        conversation.setStatus(ConversationStatus.CLOSED);
+        Conversation saved = conversationRepository.save(conversation);
+        messagingTemplate.convertAndSend(
+            "/topic/conversations/" + conversationId + "/status", ConversationDto.from(saved));
+        return saved;
     }
 }

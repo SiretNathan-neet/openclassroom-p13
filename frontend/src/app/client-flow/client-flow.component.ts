@@ -39,4 +39,16 @@ export class ClientFlowComponent implements OnInit, OnDestroy {
       this.conversation.set(conv);
     });
   }
+
+  closeConversation(): void {
+    const conv = this.conversation();
+    if (conv) {
+      this.conversationService.close(conv.id).subscribe();
+    }
+  }
+
+  onConversationClosed(): void {
+    this.conversation.set(null);
+    this.openConversation();
+  }
 }

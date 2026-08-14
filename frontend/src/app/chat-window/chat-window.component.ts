@@ -1,4 +1,4 @@
-import { Component, input, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, input, OnInit, OnDestroy, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../models/message.model';
@@ -17,6 +17,7 @@ import { ChatService } from '../services/chat.service';
 export class ChatWindowComponent implements OnInit, OnDestroy {
   conversationId = input.required<number>();
   currentUser = input.required<User>();
+  conversationClosed = output<void>();
 
   readonly messages = signal<Message[]>([]);
   draft = '';
@@ -28,8 +29,16 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
       this.messages.set(history);
     });
 
-    this.chatService.connect(this.conversationId()).subscribe(message => {
+    const { messages$, status$ } = this.chatService.connect(this.conversationId());
+
+    messages$.subscribe(message => {
       this.messages.update(msgs => [...msgs, message]);
+    });
+
+    status$.subscribe(conversation => {
+      if (conversation.status === 'CLOSED') {
+        this.conversationClosed.emit();
+      }
     });
   }
 
@@ -44,6 +53,10 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     const sender: SenderType = this.currentUser().role === 'AGENT' ? 'AGENT' : 'USER';
     this.chatService.sendMessage(this.conversationId(), this.currentUser().id, sender, content);
     this.draft = '';
+  }
+
+  endConversation(): void {
+    this.conversationService.close(this.conversationId()).subscribe();
   }
 
   isMine(message: Message): boolean {
