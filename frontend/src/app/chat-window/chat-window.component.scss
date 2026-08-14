@@ -80,4 +80,23 @@
   font-style: italic;
   padding: 0.3rem;
 }
+
+.chat-header {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  text-align: right;
+  min-height: 2rem;
+
+  .end-btn {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid #c2410c;
+    border-radius: 6px;
+    background: white;
+    color: #c2410c;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover { background: #fdeee7; }
+  }
+}
 }

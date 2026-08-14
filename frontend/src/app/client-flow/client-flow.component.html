@@ -1,10 +1,18 @@
 <div class="flow-header">
   <span>{{ currentUser().firstName }} {{ currentUser().lastName }}</span>
-  <button (click)="sessionService.clear()">Changer de profil</button>
+  <div class="actions">
+    @if (conversation()?.agent) {
+      <button (click)="closeConversation()">Clôturer la conversation</button>
+    }
+    <button (click)="sessionService.clear()">Changer de profil</button>
+  </div>
 </div>
 
 @if (conversation()?.agent) {
-  <app-chat-window [conversationId]="conversation()!.id" [currentUser]="currentUser()" />
+  <app-chat-window
+    [conversationId]="conversation()!.id"
+    [currentUser]="currentUser()"
+    (conversationClosed)="onConversationClosed()" />
 } @else {
   <div class="waiting">
     <p>En attente d'un conseiller disponible...</p>

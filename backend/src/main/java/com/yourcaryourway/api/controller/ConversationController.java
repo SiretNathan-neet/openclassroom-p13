@@ -33,16 +33,21 @@ public class ConversationController {
         return ConversationDto.from(conversationService.findOrCreateConversation(clientId));
     }
 
-    @GetMapping("/pending")
-    public List<ConversationDto> getPendingConversations() {
-        return conversationService.findOpenConversationsWithoutAgent().stream()
-                .map(ConversationDto::from)
-                .toList();
-    }
-
     @PostMapping("/{id}/assign/{agentId}")
     public ConversationDto assignAgent(@PathVariable Long id, @PathVariable Long agentId) {
-        return ConversationDto.from(conversationService.assignAgentToConversation(id, agentId));
+        return ConversationDto.from(conversationService.assignAgent(id, agentId));
+    }
+
+    @PostMapping("/{id}/close")
+    public ConversationDto close(@PathVariable Long id) {
+        return ConversationDto.from(conversationService.closeConversation(id));
+    }
+
+    @GetMapping("/pending")
+    public List<ConversationDto> getPendingConversations() {
+        return conversationService.findPending().stream()
+                .map(ConversationDto::from)
+                .toList();
     }
 
     @GetMapping("/{id}/messages")

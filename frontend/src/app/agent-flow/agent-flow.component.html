@@ -4,7 +4,7 @@
 </div>
 
 @if (activeConversation()) {
-    <app-chat-window [conversationId]="activeConversation()!.id" [currentUser]="currentUser()" />
+    <app-chat-window [conversationId]="activeConversation()!.id" [currentUser]="currentUser()" (conversationClosed)="onConversationClosed()" />
 } @else {
   <div class="pending-list">
     <h2>Conversations en attente</h2>
