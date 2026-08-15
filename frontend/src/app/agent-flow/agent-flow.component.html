@@ -1,0 +1,21 @@
+<div class="flow-header">
+    <span>{{ currentUser().firstName }} {{ currentUser().lastName }}</span>
+    <button (click)="sessionService.clear()">Changer de profil</button>
+</div>
+
+@if (activeConversation()) {
+    <app-chat-window [conversationId]="activeConversation()!.id" [currentUser]="currentUser()" (conversationClosed)="onConversationClosed()" />
+} @else {
+  <div class="pending-list">
+    <h2>Conversations en attente</h2>
+    @if (pending().length === 0) {
+        <p class="empty">Aucune conversation en attente</p>
+    } @else {
+        @for (conv of pending(); track conv.id) {
+            <button class="conv-item" (click)="pickUp(conv)">
+                {{ conv.client.firstName }} {{ conv.client.lastName }}
+            </button>
+        }
+    }
+  </div>
+}

@@ -1,0 +1,17 @@
+<div class="profile-selector">
+  <h1>Your Car Your Way — Chat PoC</h1>
+
+  <section class="role-group">
+    <h2>👤 Clients</h2>
+    @for (user of clients(); track user.id) {
+      <button (click)="selectUser(user)">{{ user.firstName }} {{ user.lastName }}</button>
+    }
+  </section>
+
+  <section class="role-group">
+    <h2>🎧 Agent</h2>
+    @for (user of agents(); track user.id) {
+      <button (click)="selectUser(user)">{{ user.firstName }} {{ user.lastName }}</button>
+    }
+  </section>
+</div>

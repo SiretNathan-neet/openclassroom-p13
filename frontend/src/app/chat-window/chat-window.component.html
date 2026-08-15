@@ -1,0 +1,21 @@
+<div class="chat-window">
+  <div class="messages">
+    @for (message of messages(); track message.id) {
+      <div class="message" [class.mine]="isMine(message)" [class.bot]="message.sender === 'BOT'">
+        <span class="sender">
+          @if (message.sender === 'BOT') { Bot } @else { {{ message.senderUser?.firstName }} }
+        </span>
+        <p>{{ message.content }}</p>
+      </div>
+    }
+  </div>
+
+  @if (!chatService.connected()) {
+    <p class="connecting">Connexion en cours...</p>
+  }
+
+  <form class="composer" (ngSubmit)="send()">
+    <input type="text" [(ngModel)]="draft" name="draft" placeholder="Écrire un message..." [disabled]="!chatService.connected()" />
+    <button type="submit" [disabled]="!chatService.connected()">Envoyer</button>
+  </form>
+</div>
