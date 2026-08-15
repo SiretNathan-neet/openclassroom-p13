@@ -1,0 +1,85 @@
+CREATE DATABASE IF NOT EXISTS your_car_your_way_poc
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE your_car_your_way_poc;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS message;
+DROP TABLE IF EXISTS conversation;
+DROP TABLE IF EXISTS users;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE users (
+    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    email               VARCHAR(255)    NOT NULL,
+    password            VARCHAR(255)    NULL,
+    last_name           VARCHAR(100)    NOT NULL,
+    first_name          VARCHAR(100)    NOT NULL,
+    birth_date          DATE            NOT NULL,
+    address             VARCHAR(255)    NOT NULL,
+    role                ENUM('CLIENT', 'AGENT', 'ADMIN') NOT NULL DEFAULT 'CLIENT',
+    sso_provider        ENUM('GOOGLE', 'APPLE', 'FACEBOOK') NULL,
+    sso_id              VARCHAR(255)    NULL,
+    email_verified      BOOLEAN         NOT NULL DEFAULT FALSE,
+    email_verif_token   VARCHAR(255)    NULL,
+    two_fa_enabled      BOOLEAN         NOT NULL DEFAULT FALSE,
+    two_fa_secret       VARCHAR(255)    NULL,
+    failed_attempts     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    locked_until        DATETIME        NULL,
+    language            VARCHAR(5)      NULL,
+    currency            VARCHAR(3)      NULL,
+    status              ENUM('ACTIVE', 'DELETED') NOT NULL DEFAULT 'ACTIVE',
+    created_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at          DATETIME        NULL,
+    CONSTRAINT uq_users_email UNIQUE (email),
+    CONSTRAINT chk_users_auth CHECK (password IS NOT NULL OR sso_provider IS NOT NULL)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE conversation (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT          NOT NULL,
+    agent_id    BIGINT          NULL,
+    status      ENUM('BOT', 'HUMAN', 'CLOSED') NOT NULL DEFAULT 'BOT',
+    started_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ended_at    DATETIME        NULL,
+    CONSTRAINT fk_conversation_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_conversation_agent FOREIGN KEY (agent_id) REFERENCES users(id),
+    CONSTRAINT chk_conversation_participants CHECK (agent_id IS NULL OR agent_id <> user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE message (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    conversation_id BIGINT          NOT NULL,
+    sender          ENUM('USER', 'BOT', 'AGENT') NOT NULL,
+    sender_id       BIGINT          NULL,
+    content         TEXT            NOT NULL,
+    sent_at         DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_message_conversation FOREIGN KEY (conversation_id) REFERENCES conversation(id),
+    CONSTRAINT fk_message_sender FOREIGN KEY (sender_id) REFERENCES users(id),
+    CONSTRAINT chk_message_sender_id CHECK (sender <> 'BOT' OR sender_id IS NULL)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_message_conversation ON message (conversation_id, sent_at);
+CREATE INDEX idx_message_sender ON message (sender_id);
+CREATE INDEX idx_conversation_agent ON conversation (agent_id);
+CREATE INDEX idx_users_role ON users (role);
+
+INSERT INTO users (email, password, last_name, first_name, birth_date, address, role, email_verified, language, currency, status) VALUES
+('nathan.dupont@example.com', '$2a$10$examplehashedpassword1', 'Dupont', 'Nathan', '1998-04-12', '10 Rue de la République, 69001 Lyon', 'CLIENT', TRUE, 'fr', 'EUR', 'ACTIVE'),
+('emma.smith@example.com',   '$2a$10$examplehashedpassword2', 'Smith', 'Emma', '1990-09-03', '221B Baker Street, London', 'CLIENT', TRUE, 'en', 'GBP', 'ACTIVE');
+INSERT INTO users (email, last_name, first_name, birth_date, address, sso_provider, sso_id, role, email_verified, language, currency, status) VALUES
+('carlos.garcia@example.com', 'Garcia', 'Carlos', '1985-01-20', 'Calle Mayor 8, Madrid', 'GOOGLE', 'google-uid-12345', 'CLIENT', TRUE, 'es', 'EUR', 'ACTIVE');
+INSERT INTO users (email, password, last_name, first_name, birth_date, address, role, email_verified, language, currency, status) VALUES
+('sofia.martin@yourcaryourway.com', '$2a$10$examplehashedpasswordagent1', 'Martin', 'Sofia', '1992-03-15', '3 Rue du Support, 75012 Paris', 'AGENT', TRUE, 'fr', 'EUR', 'ACTIVE'),
+('admin.root@yourcaryourway.com', '$2a$10$examplehashedpasswordadmin1', 'Root', 'Admin', '1988-11-02', 'Siège social, Paris', 'ADMIN', TRUE, 'fr', 'EUR', 'ACTIVE');
+
+INSERT INTO conversation (user_id, agent_id, status, started_at) VALUES
+(1, NULL, 'CLOSED', '2026-07-01 09:50:00'),
+(3, 4, 'HUMAN', '2026-06-20 08:30:00');
+
+INSERT INTO message (conversation_id, sender, sender_id, content, sent_at) VALUES
+(1, 'USER', 1, 'Bonjour, à quelle heure puis-je récupérer le véhicule ?', '2026-07-01 09:50:00'),
+(1, 'BOT', NULL, 'Bonjour ! Vous pouvez récupérer votre véhicule à partir de 9h00 le jour du départ.', '2026-07-01 09:50:20'),
+(2, 'USER', 3, 'Je ne suis pas d''accord avec le montant remboursé suite à mon annulation.', '2026-06-20 08:30:00'),
+(2, 'AGENT', 4, 'Bonjour, je transmets votre demande au service concerné, un conseiller reviendra vers vous sous 48h.', '2026-06-20 08:45:00');
