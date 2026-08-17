@@ -1,59 +1,72 @@
+Your Car Your Way - PoC Chat temps réel
+
+PoC réalisé dans le cadre du projet "Définissez une solution fonctionnelle" (formation développeur full-stack, ORION). Il démontre la faisabilité d'un mécanisme de chat temps réel (client ↔ agent) via WebSocket/STOMP, avec persistance en base de données — sans authentification, hors périmètre volontairement exclu de cette itération.
+
+récupérer une version en local via la commande "git clone https://github.com/SiretNathan-neet/openclassroom-p13.git"
+
+# Backend
+
+Java 21, Spring Boot 4.0.7, Maven
+
 # Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.13.
+Angular 21 (LTS), composants standalone, signals — sans routing
+SCSS, police Montserrat
+@stomp/stompjs + sockjs-client pour la connexion WebSocket
 
-## Development server
+# Structure du repository
 
-To start a local development server, run:
+openclassroom-p13/
+├── backend/     API Spring Boot
+└── frontend/    Application Angular
 
-```bash
+# Prérequis
+
+Java 21
+Node.js ≥ 24 et npm
+MySQL (instance locale)
+Un client SQL (DBeaver ou équivalent) pour exécuter le script de base de données
+
+# Installation et mise en route
+
+1. Base de données
+
+Exécute le script SQL du PoC sur une instance MySQL locale
+
+2. Mise en route du backend 
+
+--bash--
+cd backend
+--    --
+
+crée un fichier 'src/main/resources/application-local.properties' : 
+
+spring.datasource.url=jdbc:mysql://localhost:3306/your_car_your_way_poc
+spring.datasource.username=<ton_nom_utilisateur>
+spring.datasource.password=<ton_mot_de_passe_mysql>
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+
+--bash-- 
+./mvnw spring-boot:run
+--    --
+
+3. Mise en route du frontend
+
+Installation de Numpy : 
+
+--bash--
+cd frontend
+npm install
+--    --
+
+une fois l'installation effectué : 
+
+--bash--
 ng serve
-```
+--    --
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Ouvrir 'http://localhost:4200'
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Enjoy !
